@@ -43,52 +43,57 @@ const ChallengeState = ({ onYes }: ChallengeStateProps) => {
   return (
     <div
       ref={containerRef}
-      className={`fixed inset-0 flex flex-col items-center justify-center z-40 transition-all duration-700 ${
+      className={`fixed inset-0 z-40 transition-all duration-700 ${
         visible ? "opacity-100" : "opacity-0"
       }`}
     >
-      {/* Question */}
-      <h2
-        className="font-display text-3xl md:text-5xl text-valentine-deep text-center px-8 mb-12 transition-all duration-300 text-glow"
-        style={{ fontStyle: "italic" }}
-      >
-        {QUESTIONS[questionIndex]}
-      </h2>
+      {/* Question - fixed at the top so it's always visible */}
+      <div className="fixed top-[10%] left-0 right-0 z-[45] text-center px-8">
+        <h2
+          className="font-display text-3xl md:text-5xl text-valentine-deep transition-all duration-300 text-glow"
+          style={{ fontStyle: "italic" }}
+        >
+          {QUESTIONS[questionIndex]}
+        </h2>
+      </div>
 
-      {/* Yes Button */}
-      <button
-        onClick={onYes}
-        className="bg-valentine-rose text-primary-foreground font-display font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-30"
-        style={{
-          transform: `scale(${yesScale})`,
-          padding: "16px 48px",
-          fontSize: "1.25rem",
-        }}
-      >
-        Yes! 💕
-      </button>
+      {/* Buttons area - centered */}
+      <div className="fixed inset-0 flex flex-col items-center justify-center">
+        {/* Yes Button */}
+        <button
+          onClick={onYes}
+          className="bg-valentine-rose text-primary-foreground font-display font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer z-30"
+          style={{
+            transform: `scale(${yesScale})`,
+            padding: "16px 48px",
+            fontSize: "1.25rem",
+          }}
+        >
+          Yes! 💕
+        </button>
 
-      {/* No Button */}
-      <button
-        onMouseEnter={moveNoButton}
-        onTouchStart={moveNoButton}
-        onClick={moveNoButton}
-        className="font-display font-bold rounded-full border-2 border-valentine-deep text-valentine-deep px-8 py-3 transition-all duration-100 cursor-pointer z-30 hover:bg-valentine-pink/30"
-        style={
-          noPos
-            ? {
-                position: "fixed",
-                left: noPos.x,
-                top: noPos.y,
-                transform: "translate(-50%, -50%)",
-              }
-            : {
-                marginTop: "1.5rem",
-              }
-        }
-      >
-        No
-      </button>
+        {/* No Button */}
+        <button
+          onMouseEnter={moveNoButton}
+          onTouchStart={moveNoButton}
+          onClick={moveNoButton}
+          className="font-display font-bold rounded-full border-2 border-valentine-deep text-valentine-deep px-8 py-3 transition-all duration-100 cursor-pointer z-30 hover:bg-valentine-pink/30"
+          style={
+            noPos
+              ? {
+                  position: "fixed",
+                  left: noPos.x,
+                  top: noPos.y,
+                  transform: "translate(-50%, -50%)",
+                }
+              : {
+                  marginTop: "1.5rem",
+                }
+          }
+        >
+          No
+        </button>
+      </div>
     </div>
   );
 };
