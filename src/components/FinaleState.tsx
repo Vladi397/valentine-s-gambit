@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import confetti from "canvas-confetti";
 import mercedesImg from "@/assets/mercedes-cls.png";
 import roseImg from "@/assets/rose.png";
 
@@ -35,6 +36,15 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
 
   useEffect(() => {
     setShowOverlay(true);
+
+    // Fire confetti bursts
+    const fireConfetti = () => {
+      confetti({ particleCount: 80, spread: 100, origin: { x: 0.2, y: 0.5 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700"] });
+      confetti({ particleCount: 80, spread: 100, origin: { x: 0.8, y: 0.5 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700"] });
+    };
+    fireConfetti();
+    const confettiInterval = setInterval(fireConfetti, 1500);
+
     const start = Date.now();
     const duration = 5000;
 
@@ -45,10 +55,15 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
+        clearInterval(confettiInterval);
+        // One final big burst
+        confetti({ particleCount: 200, spread: 160, origin: { y: 0.6 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700", "#ffffff"] });
         setTimeout(onComplete, 500);
       }
     };
     requestAnimationFrame(animate);
+
+    return () => clearInterval(confettiInterval);
   }, [onComplete]);
 
   const trailText = "Congratulations, you will be my valentine, I love you ❤️";
@@ -111,10 +126,9 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
           src={mercedesImg}
           alt="Mercedes AMG CLS"
           className="w-48 md:w-72 drop-shadow-2xl"
-          style={{ transform: "scaleX(-1)" }}
         />
         {/* Smoke trail */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 flex gap-1">
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full flex flex-row-reverse gap-1">
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
