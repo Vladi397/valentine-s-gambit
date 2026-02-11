@@ -1,12 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useCallback } from "react";
+import RoseBorder from "@/components/RoseBorder";
+import LoadingState from "@/components/LoadingState";
+import ChallengeState from "@/components/ChallengeState";
+import FinaleState from "@/components/FinaleState";
+import FinalView from "@/components/FinalView";
+
+type AppState = "loading" | "challenge" | "finale" | "final";
 
 const Index = () => {
+  const [state, setState] = useState<AppState>("loading");
+
+  const handleReplay = useCallback(() => {
+    setState("loading");
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background overflow-hidden relative">
+      <RoseBorder />
+
+      {state === "loading" && (
+        <LoadingState onComplete={() => setState("challenge")} />
+      )}
+
+      {state === "challenge" && (
+        <ChallengeState onYes={() => setState("finale")} />
+      )}
+
+      {state === "finale" && (
+        <FinaleState onComplete={() => setState("final")} />
+      )}
+
+      {state === "final" && <FinalView onReplay={handleReplay} />}
     </div>
   );
 };
