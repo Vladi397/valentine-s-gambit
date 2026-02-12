@@ -6,7 +6,7 @@ const QUESTIONS = [
   "Are you 100% sure?",
   "Really??",
   "Think about it again...",
-  "But I have a Mercedes!",
+  "But I Love You! ❤️",
   "I'll take you to Paris 🗼",
   "I'll cook for you every day 🍝",
   "Please? 🥺",
