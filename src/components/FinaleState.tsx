@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import confetti from "canvas-confetti";
 import mercedesImg from "@/assets/mercedes-cls.png";
 import roseImg from "@/assets/rose.png";
@@ -10,10 +10,12 @@ interface FinaleStateProps {
 const FinaleState = ({ onComplete }: FinaleStateProps) => {
   const [carProgress, setCarProgress] = useState(0);
   const [showOverlay, setShowOverlay] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // --- HEARTS & ROSES (Unchanged) ---
   const hearts = useMemo(
     () =>
-      Array.from({ length: 30 }, (_, i) => ({
+      Array.from({ length: 40 }, (_, i) => ({
         x: Math.random() * 100,
         size: 20 + Math.random() * 30,
         delay: Math.random() * 4,
@@ -25,7 +27,7 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
 
   const fallingRoses = useMemo(
     () =>
-      Array.from({ length: 15 }, (_, i) => ({
+      Array.from({ length: 20 }, (_, i) => ({
         x: Math.random() * 100,
         delay: Math.random() * 5,
         duration: 4 + Math.random() * 4,
@@ -37,7 +39,7 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
   useEffect(() => {
     setShowOverlay(true);
 
-    // Fire confetti bursts
+    // 1. Confetti Logic
     const fireConfetti = () => {
       confetti({ particleCount: 80, spread: 100, origin: { x: 0.2, y: 0.5 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700"] });
       confetti({ particleCount: 80, spread: 100, origin: { x: 0.8, y: 0.5 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700"] });
@@ -45,8 +47,27 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
     fireConfetti();
     const confettiInterval = setInterval(fireConfetti, 1500);
 
+    // 2. HONK LOGIC (Robust)
+    // Create audio object once
+    audioRef.current = new Audio("/honk.mp3");
+    audioRef.current.volume = 0.5;
+
+    const playHonk = () => {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch((err) => {
+          console.warn("Honk blocked or missing file:", err);
+        });
+      }
+    };
+
+    // Play immediately, then every 1.5s
+    playHonk(); 
+    const honkInterval = setInterval(playHonk, 1500);
+
+    // 3. Movement Logic
     const start = Date.now();
-    const duration = 5000;
+    const duration = 6000;
 
     const animate = () => {
       const elapsed = Date.now() - start;
@@ -56,14 +77,17 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
         requestAnimationFrame(animate);
       } else {
         clearInterval(confettiInterval);
-        // One final big burst
+        clearInterval(honkInterval); 
         confetti({ particleCount: 200, spread: 160, origin: { y: 0.6 }, colors: ["#ff69b4", "#ff1493", "#ff6b6b", "#ffd700", "#ffffff"] });
         setTimeout(onComplete, 500);
       }
     };
     requestAnimationFrame(animate);
 
-    return () => clearInterval(confettiInterval);
+    return () => {
+      clearInterval(confettiInterval);
+      clearInterval(honkInterval);
+    };
   }, [onComplete]);
 
   const trailText = "Congratulations, you will be my valentine, I love you ❤️";
@@ -71,7 +95,7 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
 
   return (
     <div className="fixed inset-0 z-40 overflow-hidden">
-      {/* Hearts floating up */}
+      {/* Background Hearts */}
       {showOverlay &&
         hearts.map((h, i) => (
           <span
@@ -88,7 +112,7 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
           </span>
         ))}
 
-      {/* Falling roses */}
+      {/* Falling Roses */}
       {showOverlay &&
         fallingRoses.map((r, i) => (
           <img
@@ -106,41 +130,75 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
           />
         ))}
 
-      {/* Trail text */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center px-8">
-        <p className="font-script text-4xl md:text-6xl text-valentine-deep text-glow">
+      {/* Trail Text */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center px-8 z-10">
+        <p className="font-script text-4xl md:text-6xl text-valentine-deep text-glow font-bold drop-shadow-md">
           {trailText.slice(0, visibleChars)}
           <span className="animate-pulse">|</span>
         </p>
       </div>
 
-      {/* Mercedes */}
+      {/* --- THE MERCEDES CONTAINER --- */}
       <div
-        className="absolute bottom-[15%]"
+        className="absolute bottom-[10%]"
         style={{
-          left: `${carProgress * 120 - 20}%`,
+          left: `${carProgress * 130 - 30}%`,
           transition: "none",
         }}
       >
-        <img
-          src={mercedesImg}
-          alt="Mercedes AMG CLS"
-          className="w-48 md:w-72 drop-shadow-2xl"
-        />
-        {/* Smoke trail */}
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full flex flex-row-reverse gap-1">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="rounded-full bg-muted/50"
-              style={{
-                width: 12 + i * 6,
-                height: 12 + i * 6,
-                opacity: 0.3 - i * 0.05,
-                marginRight: i * 4,
-              }}
-            />
-          ))}
+        <div className="relative">
+          {/* THE CAR (Bouncing) */}
+          <img
+            src={mercedesImg}
+            alt="Mercedes AMG CLS"
+            className="w-80 md:w-[600px] drop-shadow-2xl z-20 relative"
+            style={{
+              animation: "drive-bounce 0.15s infinite alternate ease-in-out",
+            }}
+          />
+
+          {/* --- REALISTIC HEADLIGHT BEAMS --- */}
+          {/* Right Headlight (Far side) */}
+          <div 
+            className="absolute z-10 headlight-cone"
+            style={{
+                width: "400px",
+                height: "100px",
+                right: "-350px", // Project out front
+                top: "35%", // Align with headlight
+                transform: "rotate(5deg)"
+            }}
+          />
+           {/* Left Headlight (Near side) */}
+           <div 
+            className="absolute z-30 headlight-cone"
+            style={{
+                width: "400px",
+                height: "100px",
+                right: "-350px",
+                top: "40%", 
+                transform: "rotate(5deg)",
+                opacity: 0.8
+            }}
+          />
+
+          {/* --- EXHAUST FUMES --- */}
+          <div className="absolute left-[5%] bottom-[15%] z-10">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={`gas-${i}`}
+                className="absolute rounded-full bg-gray-300 blur-md"
+                style={{
+                  width: 20,
+                  height: 20,
+                  animation: `fume-move 0.8s linear infinite`,
+                  animationDelay: `${i * 0.15}s`,
+                  opacity: 0, 
+                }}
+              />
+            ))}
+          </div>
+
         </div>
       </div>
     </div>
