@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import confetti from "canvas-confetti";
 import mercedesImg from "@/assets/mercedes-cls.png";
 import roseImg from "@/assets/rose.png";
+import leftGif from "@/assets/left.gif";
+import rightGif from "@/assets/right.gif";
 
 interface FinaleStateProps {
   onComplete: () => void;
@@ -130,12 +132,26 @@ const FinaleState = ({ onComplete }: FinaleStateProps) => {
           />
         ))}
 
-      {/* Trail Text */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center px-8 z-10">
-        <p className="font-script text-4xl md:text-6xl text-valentine-deep text-glow font-bold drop-shadow-md">
+      {/* Trail Text with GIFs */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full flex items-center justify-center gap-4 md:gap-8 px-8 z-10">
+        {/* Left GIF */}
+        <img 
+          src={leftGif} 
+          alt="" 
+          className="w-16 h-16 md:w-32 md:h-32 object-contain"
+        />
+
+        <p className="font-script text-4xl md:text-6xl text-valentine-deep text-glow font-bold drop-shadow-md text-center">
           {trailText.slice(0, visibleChars)}
           <span className="animate-pulse">|</span>
         </p>
+
+        {/* Right GIF */}
+        <img 
+          src={rightGif} 
+          alt="" 
+          className="w-16 h-16 md:w-32 md:h-32 object-contain"
+        />
       </div>
 
       {/* --- THE MERCEDES CONTAINER --- */}
