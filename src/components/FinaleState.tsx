@@ -2,8 +2,8 @@ import { useEffect, useState, useMemo, useRef } from "react";
 import confetti from "canvas-confetti";
 import mercedesImg from "@/assets/mercedes-cls.png";
 import roseImg from "@/assets/rose.png";
-import leftGif from "@/assets/left.gif";
-import rightGif from "@/assets/right.gif";
+import leftGif from "@/assets/tenor.gif"; // Using the file you actually have
+
 
 interface FinaleStateProps {
   onComplete: () => void;
